@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>证书信息</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #DAECF6;
+            overflow: hidden;
+        }
+
+        /* 图片容器：居中显示图片 */
+        .img-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #target-img {
+            max-width: 100%;
+            max-height: 100%;
+            height: auto;
+            transform-origin: center center;
+            transition: transform 0.2s ease;
+        }
+
+        /* 缩放按钮：固定在右下角 */
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .zoom-btn:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        /* 验证码容器：白色背景，全屏居中 */
+        #verification-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20; /* 确保在图片和按钮上层 */
+        }
+
+        .verification-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        #verification-code {
+            font-family: "Arial", sans-serif;
+            font-size: 20px;
+            letter-spacing: 5px;
+            border: 1px solid blue;
+            padding: 5px 10px;
+            user-select: none; /* 防止选中验证码文字 */
+        }
+
+        #verification-input {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #verify-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #verify-btn:hover {
+            background-color: #3367d6;
+        }
+    </style>
+</head>
+<body>
+    <!-- 验证码容器：初始显示 -->
+    <div id="verification-container">
+        <h2>请输入验证码</h2>
+        <div class="verification-input-group">
+            <input type="text" id="verification-input" placeholder="请输入验证码">
+            <span id="verification-code">fghu</span> <!-- 初始验证码（可随机生成） -->
+        </div>
+        <button id="verify-btn">确认</button>
+    </div>
+
+    <!-- 图片容器：验证通过后显示 -->
+    <div class="img-container">
+        <img id="target-img" 
+             src="https://i.ibb.co/TMDQ2gf0/2-1-1.jpg" 
+             alt="2-1-1" 
+             border="0">
+    </div>
+
+    <!-- 缩放按钮 -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoom-out">-</button>
+        <button class="zoom-btn" id="zoom-in">+</button>
+    </div>
+
+    <script>
+        // ---------- 验证码逻辑 ----------
+        const verificationContainer = document.getElementById('verification-container');
+        const verificationInput = document.getElementById('verification-input');
+        const verificationCodeEl = document.getElementById('verification-code');
+        const verifyBtn = document.getElementById('verify-btn');
+
+        // 生成随机4位字母验证码（可扩展为包含数字/干扰）
+        function generateVerificationCode() {
+            const chars = 'abcdefghijklmnopqrstuvwxyz';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                code += chars[Math.floor(Math.random() * chars.length)];
+            }
+            verificationCodeEl.textContent = code;
+            return code;
+        }
+
+        let correctCode = generateVerificationCode(); // 初始化验证码
+
+        // 确认按钮点击事件
+        verifyBtn.addEventListener('click', () => {
+            const inputCode = verificationInput.value.toLowerCase();
+            if (inputCode === correctCode) {
+                verificationContainer.style.display = 'none'; // 验证通过，隐藏验证码界面
+            } else {
+                verificationInput.value = ''; // 清空输入
+                correctCode = generateVerificationCode(); // 重新生成验证码
+                alert('验证码错误，请重新输入');
+            }
+        });
+
+        // 回车触发验证
+        verificationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                verifyBtn.click();
+            }
+        });
+
+        // ---------- 图片缩放逻辑 ----------
+        const img = document.getElementById('target-img');
+        let scale = 1;
+
+        document.getElementById('zoom-in').addEventListener('click', () => {
+            scale += 0.1;
+            img.style.transform = `scale(${scale})`;
+        });
+
+        document.getElementById('zoom-out').addEventListener('click', () => {
+            if (scale > 0.5) {
+                scale -= 0.1;
+                img.style.transform = `scale(${scale})`;
+            }
+        });
+    </script>
+</body>
+</html>
